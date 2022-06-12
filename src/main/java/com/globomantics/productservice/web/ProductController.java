@@ -144,20 +144,20 @@ public class ProductController {
      *              404 Not Found if a product with the specified ID is not found
      *              500 Internal Service Error if an error occurs during deletion
      */
-    @DeleteMapping("/product/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
+    @DeleteMapping("product/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable int id) {
 
         logger.info("Deleting product with ID {}", id);
 
         // Get the existing product
         Optional<Product> existingProduct = productService.findById(id);
 
-        return existingProduct.map(p -> {
-            if (productService.delete(p.getId())) {
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-        }).orElse(ResponseEntity.notFound().build());
+        return existingProduct.map(product -> {
+                    if (productService.delete(product.getId())) {
+                        return ResponseEntity.ok().build();
+                    } else {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    }
+                }).orElse(ResponseEntity.notFound().build());
     }
 }
