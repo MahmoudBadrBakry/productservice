@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
 /**
  * Tests the ProductService.
  */
@@ -38,58 +41,61 @@ class ProductServiceTest {
     private ProductRepository repository;
 
     @Test
-    @DisplayName("Test findById Success")
-    void testFindByIdSuccess() {
+    @DisplayName("Test findById(1)")
+    void testFindById() {
         // Setup our mock
-        Product mockProduct = new Product(1, "Product Name", 10, 1);
-        doReturn(Optional.of(mockProduct)).when(repository).findById(1);
+        Product originalObject = new Product(1, "name", 11, 1);
+        doReturn(Optional.of(originalObject)).when(repository).findById(1);
 
         // Execute the service call
-        Optional<Product> returnedProduct = service.findById(1);
+        Optional<Product> optionalOfFoundObject = service.findById(1);
 
         // Assert the response
-        Assertions.assertTrue(returnedProduct.isPresent(), "Product was not found");
-        Assertions.assertSame(returnedProduct.get(), mockProduct, "Products should be the same");
+        assertTrue(optionalOfFoundObject.isPresent(), "Product should be existed");
+        assertSame(originalObject, optionalOfFoundObject.get(), "Products should be the same");
     }
 
-    @Test
-    @DisplayName("Test findById Not Found")
-    void testFindByIdNotFound() {
-        // Setup our mock
-        Product mockProduct = new Product(1, "Product Name", 10, 1);
-        doReturn(Optional.empty()).when(repository).findById(1);
-
-        // Execute the service call
-        Optional<Product> returnedProduct = service.findById(1);
-
-        // Assert the response
-        Assertions.assertFalse(returnedProduct.isPresent(), "Product was found, when it shouldn't be");
-    }
 
     @Test
-    @DisplayName("Test findAll")
+    @DisplayName("Test findAll()")
     void testFindAll() {
         // Setup our mock
-        Product mockProduct = new Product(1, "Product Name", 10, 1);
-        Product mockProduct2 = new Product(2, "Product Name 2", 15, 3);
-        doReturn(Arrays.asList(mockProduct, mockProduct2)).when(repository).findAll();
+        Product originalObject = new Product(1, "name", 11, 1);
+        Product originalObject1 = new Product(1, "name", 11, 1);
+        doReturn(Arrays.asList(originalObject1, originalObject)).when(repository).findAll();
 
-        // Execute the service call
-        List<Product> products = service.findAll();
+        // Execute service
+        List<Product> productList = service.findAll();
 
-        Assertions.assertEquals(2, products.size(), "findAll should return 2 products");
+        // Assert the response
+        assertEquals(productList.size(), 2, "Size of retrieved objects should be 2");
     }
 
     @Test
-    @DisplayName("Test save product")
+    @DisplayName("Test Delete(1)")
+    void testDelete() {
+        // Setup our mock
+        doReturn(true).when(repository).delete(1);
+
+        // Execute the service
+        boolean result = service.delete(1);
+
+        // Assert the response
+        assertTrue(result, "Product should be deleted");
+    }
+
+    @Test
+    @DisplayName("Test save(productObj)")
     void testSave() {
-        Product mockProduct = new Product(1, "Product Name", 10);
+        // Setup our mock
+        Product mockProduct = new Product(1, "name", 11);
         doReturn(mockProduct).when(repository).save(any());
 
+        // Execute service call
         Product returnedProduct = service.save(mockProduct);
 
-        Assertions.assertNotNull(returnedProduct, "The saved product should not be null");
-        Assertions.assertEquals(1, returnedProduct.getVersion().intValue(),
-                "The version for a new product should be 1");
+        // Assert the response
+        assertNotNull(returnedProduct, "returned product cannot be null");
+        assertEquals(Integer.valueOf(1), returnedProduct.getVersion(), "Version should be 1");
     }
 }
