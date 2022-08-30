@@ -147,6 +147,8 @@ public class ProductController {
     @DeleteMapping("/product/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Integer id) {
         logger.info("Deleting product with ID {}", id);
+
+        // Find existing product
         Optional<Product> existingProduct = productService.findById(id);
 
         return existingProduct.map(product -> {
