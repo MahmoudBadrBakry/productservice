@@ -184,44 +184,46 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /product/1 - Success")
-    void testDeleteProductSuccess() throws Exception {
-        // Set up mocked service
-        Product product = new Product(1, "product", 20, 1);
-        doReturn(Optional.of(product)).when(productService).findById(1);
-        doReturn(true).when(productService).delete(any());
+    @DisplayName("DELETE /product/1 Success")
+    void testProductDeleteSuccess() throws Exception {
+        // Set up the mocked product
+        Product mockProduct = new Product(1, "product", 11, 1);
 
-        // Execute DELETE request
+        // Set up the mocked Service
+        doReturn(Optional.of(mockProduct)).when(productService).findById(1);
+        doReturn(true).when(productService).delete(1);
+
+        // Execute our DELETE request
         mockMvc.perform(delete("/product/{id}", 1))
-
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("DELETE /product/1 - Failed")
-    void testDeleteProductFailed() throws Exception {
-        // Set up mocked service
-        Product product = new Product(1, "product", 20, 1);
-        doReturn(Optional.of(product)).when(productService).findById(1);
-        doReturn(false).when(productService).delete(any());
+    @DisplayName("DELETE /product/1 - Not Found")
+    void testProductDeleteNotFound() throws Exception {
+        // Set up mocked Service
+        doReturn(Optional.empty()).when(productService).findById(1);
 
-        // Execute DELETE request
+        // Execute the Service call
         mockMvc.perform(delete("/product/{id}", 1))
-
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("DELETE /product/1 - Not Found")
-    void testDeleteProductNotFound() throws Exception {
-        // Set up mocked service
-        doReturn(Optional.empty()).when(productService).findById(1);
+    @DisplayName("DELETE /product/1 - Failure")
+    void testProductDeleteFailed() throws Exception {
+        // Set up the mocked product
+        Product mockProduct = new Product(1, "product", 11, 1);
 
-        // Execute DELETE request
+        // Set up the mocked Service
+        doReturn(Optional.of(mockProduct)).when(productService).findById(1);
+        doReturn(false).when(productService).delete(1);
+
+        // Execute the Service call
         mockMvc.perform(delete("/product/{id}", 1))
-
-                .andExpect(status().isNotFound());
+                .andExpect(status().isInternalServerError());
     }
+
 
 
 
